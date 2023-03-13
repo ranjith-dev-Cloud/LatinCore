@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <!-- Bootstrap JS -->
+
+    <!-- JS API CDN-->
+   <script src="https://js.zohostatic.com/creator/widgets/version/1.0/widgetsdk-min.js"></script>
+  <!-- <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script> -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.3/jquery.js" type="text/javascript"></script> 
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" type="text/javascript" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js" type="text/javascript"> </script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
+
+  <!-- Datepicker -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js" type="text/javascript"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker3.min.css">
+
+  <!-- font-awesome -->
+<!-- <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet"> -->
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css" integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/" crossorigin="anonymous">
+    
+<!-- bootstrap -->
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+<!-- Draggable Table-->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/TableDnD/0.9.1/jquery.tablednd.js" type="text/javascript" integrity="sha256-d3rtug+Hg1GZPB7Y/yTcRixO/wlI78+2m08tosoRn7A=" crossorigin="anonymous"></script>
+
+<!--Custom CSS/JS-->
+ <link rel="stylesheet" href="css/salesOrder.css">
+ <link rel="stylesheet" href="css/tabledragdrop.css">
+ <script src="js/salesorder.js" type="text/javascript"></script>
+ <script src="js/autoresize.js" type="text/javascript"></script>
+ <!-- <script src="js/tablerow.js" type="text/javascript"></script> -->
+ <script src="js/salesorderApi.js" type="text/javascript"></script>
+  </head>
+
+  <div class="container-fluid">
+
+   <!-- header -->
+<div class="header row-md-12">
+    <h3 class="heading_text">New Sales Order
+        <img style="float: right; margin: 0px 0px 15px 15px;" src="images/LatinCoreLogo.jpg" width="100" />
+        <img style="float: right; margin: 0px 0px 15px 15px;" src="images/cloudlionlogo.png" width="100" />
+       </h3>
+
+</div>
+
+   <!-- Form Starts here-->
+   <form action="" name="newSalesOrder" id="newSalesOrder">
+    <div class="Customer_field_div">
+        <div class="form-group row Customer_field">
+            <label for="CustomerNameField" class="col-sm-2 col-form-label text_red required">Customer Name</label>
+            <div class="col-md-5 input-group">
+                <!-- <select class="form-control" id="CustomerNameField" name="CustomerNameField" onchange=showAddressDetails();getItemListForTable();fetchTaxRates()> -->
+                    <select class="form-control" id="CustomerNameField" name="CustomerNameField" onchange=showAddressDetails();getItemListForTable();>
+                    <option value="" selected disabled>Select Customer</option>
+                </select>
+                <div class="input-group-append">
+                    <button class="btn btn-primary" type="button" id="Customer_Modal_Search"><i class="fas fa-search"></i></button>  
+                </div>
+                 <div class="invalid-feedback" id="customerFieldErr" style="visibility: hidden;">
+                    Please select customer Name.
+                  </div> 
+            </div>
+        </div>
+    </div>
+    <div id="addressTaxDiv"  style="display: none;">
+    <div class="row col-md-12" style="background-color: #ffffff;" id="address">
+        <div class="col-md-2"></div>
+        <div class="col-md-5" style="padding-right: 0px;padding-left: 0px;">
+        <div class="row col-md-12">
+            <div class="col-md-4 addr">
+                    <label for="billingAddr">Billing Address </label> <br>
+                    <textarea id="billingAddr" class ="autoResizeTextArea" disabled>
+                    </textarea > 
+            </div>
+            <div class="col-md-2"></div>
+            <div class="col-md-4 addr">   
+                    <label for="shippingAddr">Shipping Address </label> <br>
+                    <textarea id="shippingAddr" class ="autoResizeTextArea" disabled>
+                    </textarea ><br><br>
+            </div>
+        </div>
+        </div>
+    </div>
+    <div class="row col-md-12">
+        <div class="col-md-2"></div>
+        <div class="col-md-5" style="padding-right: 0px;padding-left: 14px;">
+            <label for="tax">Tax : </label>
+            <input type="text" id="tax" disabled><br><br>
+        </div>
+    </div>
+    <div >
+        <br>
+         
+        </div>
+    </div>
+    <div id="hiddenDiv" style="display: none;">
+            <input type="hidden" id="customerTaxRate" value="">
+    </div>
+    
+        <div class="form-group row sales_order">
+            <!-- <label for="saleord" class="col-sm-2 col-form-label required text_red">Sales Order#</label> -->
+            <label for="saleord" class="col-sm-2 col-form-label">Sales Order#</label>
+                <div class="col-sm-4">
+                    <input type="text" class="form-control" id="saleord">
+                </div>
+        </div>
+    
+        <div class="form-group row">
+            <label for="ref" class="col-sm-2 col-form-label">Reference#</label>
+                <div class="col-sm-4">
+                    <input type="text" class="form-control" id="ref" value="">
+                </div>
+        </div>
+    
+        <div class="form-group row">
+            <label for="salesOrderDatepicker" class="col-sm-2 col-form-label required text_red">Sales Order Date</label>
+                <div class="col-sm-4">
+                    <div class="datepicker date input-group">
+                        <input type="text" placeholder="Choose Date" class="form-control" id="salesOrderDatepicker" required>
+                        <div class="input-group-append">
+                          <!-- <span class="input-group-text"><i class="fa fa-calendar"></i></span> -->
+                        </div>
+                    </div>
+                    <div class="invalid-feedback" id="salesOrderDateErr"  style="visibility: hidden;">
+                        Please select a Sales Order Date.
+                      </div> 
+                </div>
+        </div>
+    
+        <div class="form-group row">
+            <label for="datepicker2" class="col-sm-2 col-form-label">Expected Shipment Date</label>
+                <div class="col-sm-4">
+                    <div class="datepicker date input-group">
+                        <input type="text" placeholder="Choose Date" class="form-control" id="datepicker2" >
+                        <div class="input-group-append">
+                          <!-- <span class="input-group-text"><i class="fa fa-calendar"></i></span> -->
+                        </div>
+                    </div>
+               </div>
+        </div>
+    
+        <div class="form-group row">
+            <label for="paymentTerms" class="col-sm-2 col-form-label">Payment Terms</label>
+            <div class="col-md-4 input-group">
+                <select class="form-control" id="paymentTerms" name="sellist2">
+                    <option value="">Select Payment Terms</option>
+                </select>
+            </div>
+        </div>
+    
+        <hr>
+    
+        <div class="form-group row">
+            <label for="deliveryMethod" class="col-sm-2 col-form-label">Delivery Method</label>
+            <div class="col-md-4 input-group">
+                <select class="form-control" id="deliveryMethod" name="sellist3">
+                    <option value="">Select Delivery Method</option>
+                </select>
+            </div>
+        </div>
+        
+        <div class="form-group row">
+            <label for="wareHouseName" class="col-sm-2 col-form-label required text_red">Warehouse Name</label>
+            <div class="col-md-4 input-group">
+                <select class="form-control" id="wareHouseName" name="wareHouseList">
+                    <option value="">Select WareHouse Name</option>
+                     <!-- <option value="Latin Core Inc.">Latin Core Inc.</option>  -->
+                   </select>
+                    <div class="invalid-feedback" id="wareHouseErr"  style="visibility: hidden;">
+                    Please select WareHouse.
+                  </div> 
+            </div>
+        </div>
+    
+        <div class="form-group row">
+            <label for="salesPerson" class="col-sm-2 col-form-label">Salesperson</label>
+            <div class="col-md-4 input-group">
+                <select class="form-control" id="salesPerson" name="sellist5">
+                    <option value="">Select SalesPerson</option>
+                </select>
+            </div>
+        </div>
+   <div class="form-group row">
+    <!-- Responsive Table Starts Here-->
+    <input type="hidden" value="0" id="rowID">
+      <table class="table table-bordered table-hover justify-content-center" id="tblData">
+        <thead>
+            <tr>
+              <th class="text-justify" scope="col" style="width:20%;">ITEM DETAILS</th>
+              <th class="text-justify" scope="col" style="width:10%;">LOCATION</th>
+              <th class="text-justify" scope="col" style="width:10%;">SKU</th>
+              <th class="text-justify" scope="col" style="width:15%;">QUANTITY</th>
+              <th class="text-justify" scope="col" style="width:15%;">RATE</th>
+              <th class="text-justify" scope="col" style="width:15%;">TAX</th>
+              <th class="text-justify" scope="col" style="width:8%;">AMOUNT</th>
+              <th style="width:7%;"></th>
+           </tr>
+          </thead>
+        <tbody id="tbody">
+                   <tr scope="row" id="rowToClone" ><td>
+                    <select class="form-control" id="selectItem" name="itemDetailsSelect"  onchange="setValuesinTable(event)" >
+                  <option value="">-- Select --</option>
+                </select>
+                <br><input type="hidden" id="selectedItemID" class="selectedItemID">
+                </div><br>
+                   <textarea class='itemDescription transparent-textarea' name="itemDescription" rows="1" cols="30" style="resize: none" placeholder="Add a description to your item"> </textarea></td>
+                   <td></td>
+                   <td><input type="text" class="skuValueColumn transparent-input" id="skuValueColumn" name="skuValueColumn"></td>
+                   <td><p><input type="text" name="quantity" class="form-control Quantity" id="quantity" value="1.00"></p> <br>
+                    <label>Stock in Hand: <br />
+                        <!-- <span name="stockinHandValue" id="stockinHandValue">5</span> Box</label><br/> -->
+                        <input type="text" id="stockinHandValue" class="stockinHandValue transparent-input" name="stockinHandValue"/>
+                      <label>Actual Stock in Hand: <br />
+                        <!-- <span name="ActualstockinHandValue" id="ActualstockinHandValue">9</span> Box</label> -->
+                        <input type="text" id="actualStockinHandValue" class="actualStockinHandValue transparent-input" name="actualStockinHandValue"/><br>
+                    <a href="#" class="linkText" disabled>Latin core Inc</a></td>
+                  <td><input type="text" class="form-control rateValueColumn transparent-input" name="rateValueColumn " id="rateValueColumn" value=""> <br> <select class="form-control" disabled><option value="Apply Price List">Apply Price List</option><option value="Food Basics">Food Basics</option></select><br>
+                    <a href="#" id="transactionModal" onclick="populateTransactionsModal(this);">Recent Transactions</a></td>
+                  <td><select class="form-control taxDetailsDropdown" name="taxDetails" id="taxDetails" onchange="calculateSubTotal();disableTaxDetails();">
+                        <option value="Non-Taxable">Non Taxable</option>
+                         <option value="">HST (13%)</option> 
+                    </select><br><input type="text" class="form-control transparent-input" id="exemptionReason">
+                    </td>
+                  <td><input type="text" id="totalAmount" name="totalAmount" class="totalAmount transparent-input"></td><td>
+                    <div class="dropdown">
+                        <button class="dropbtn">
+                            <i id="add_row" class="fas fa-ellipsis-h" style='font-size:20px;color:#210f38;margin-top: 3px;' aria-hidden="true"></i></button>
+                        <div class="dropdown-content">
+                            <a href="#" id="clone_tablerow" onclick="Clone()" value="Clone">Clone</a>
+                        </div>      
+                    </div>
+                    </div>
+                    <i id="deleteRow" class="far fa-times-circle" aria-hidden="true" style='font-size:20px;color:#880808;margin-top: 3px;' onclick="deleteRow(this);"></i></td>
+               </tr>
+              </tbody>
+             </table>
+             <button class="btn btn-md btn-primary" id="addBtn" type="button" onclick="addNewTableRow();"><i class="fa fa-plus">Add Another Line</i></button>
+            <!-- Responsive Table Ends Here-->
+             <!--SubTotal Table Starts Here -->
+             <div class="row col-md-12" >
+              <div class="col-md-4" >
+                  <div class="form-group" style="margin-top: 50%;">
+                      <label for="exampleFormControlTextarea1">Customer Notes</label>
+                      <textarea class="form-control" id="exampleFormControlTextarea1" rows="2" placeholder="Enter any notes to be displayed in your contacts"></textarea>
+                    </div>
+              </div>
+              <!-- <div class="col-md-1">Calculate<input type="checkbox" onclick="calculateTotal()"></div> -->
+              <div class="col-md-7" style="background-color: #fbfafa;border-radius: 4px;">
+                  <table class="table">
+                      <thead>
+                      </thead>
+                      <tbody>
+                          <tr>
+                              <td>Sub Total</td>
+                              <td></td>
+                              <td></td>
+                              <td></td>
+                              <td></td>
+                              <td></td>
+                              <td style="width:200px;"></td>
+                              <td><span>$</span><span id="subTotal">0.00</span></td>
+                          </tr>
+                          <tr>
+                              <td>Discount</td>
+                              <td style="width:150px;">
+          
+                                  <div class="input-group">
+                                      <input type="text" class="form-control" aria-label="Text input with dropdown button" id="discount" onblur="populateValue()">
+                                      <div class="input-group-append">
+                                        <!-- <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-toggle="dropdown" aria-expanded="true" onclick="populateValue()">$</button>
+                                        <div class="dropdown-menu">
+                                          <a class="dropdown-item" href="#" id="percentLabel">%</a>
+                                          <a class="dropdown-item" href="#" id="dollarLabel">$</a>
+                                        </div> -->
+                                        <select id="discountType" onchange="populateValue()">
+                                            <option value="$">$</option>
+                                            <option value="%">%</option>
+                                        </select>
+                                      </div>
+                                    </div>
+                              </td>
+                              <td></td>
+                              <td></td>
+                              <td></td>
+                              <td></td>
+                              <td></td>
+                              <td><span>$</span><span id="discountForCalculation">0.00</span></td>
+                          </tr>
+                          <tr>
+                              <td>Shipping Charges <br> <a href="#" class="linkText">Apply Tax on Shipping Charge</a></td>
+                             
+                              <td style="width:150px;">
+                                  <div>
+                                      <input type="text" class="form-control" id="shippingCharges" onblur="populateValue()">
+                                  </div>
+                              </td>
+                              <td></td>
+                              <td></td>
+                              <td></td>
+                              <td></td>
+                              <td></td>
+                              <td><span>$</span><span id="shippingChargesValue">0.00</span></td>
+                          </tr>
+                          <tr id="taxDetailsDiv">
+                            <td><span id="taxName"></span></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td style="width:200px;"></td>
+                            <td><span id="taxDetailsValue"></span></td>
+                        </tr>
+                           <tr>
+                              <td style="width:160px;"> 
+                                  <div>
+                                      <input type="text" class="form-control" id="adjustment" value="Adjustment">
+                                  </div>
+                              </td>
+                             
+                              <td style="width:150px;">
+                                  <div>
+                                      <input type="text" class="form-control" id="adjustmentData" value=""  onblur="populateValue();calculateTotal()">
+                                  </div>
+                              </td>
+                              <td></td>
+                              <td></td>
+                              <td></td>
+                              <td></td>
+                              <td></td>
+                              <td><span>$</span><span id="adjustmentValue">0.00</span></td>
+                          </tr>
+                          <tr>
+                              <td><h4>Total ( $ )</h4></td>
+                              <td></td>
+                              <td></td>
+                              <td></td>
+                              <td></td>
+                              <td></td>
+                              <td></td>
+                              <td><h4><span>$</span><span id="totalValueCalculated">0.00</span></h4></td>
+                          </tr>
+          
+                      </tbody>
+                  </table>
+              </div>
+          
+          </div>
+          
+          </div>
+          </div>
+                    <!-- bottom part -->
+                    <div class="row col-md-12" style="background-color: #fbfafa;">
+                        <div class="col-md-6" style="border-right: 1px solid gainsboro;">
+                            
+                                <div class="form-group">
+                                    <label for="exampleFormControlTextarea1">Terms & Conditions</label>
+                                    <textarea class="form-control" id="exampleFormControlTextarea1" rows="3" placeholder="Enter the terms and conditions of your contacts"></textarea>
+                                </div>
+                            
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="exampleFormControlFile1">Attach File(s) to Sales Order </label>
+                                <input type="file" class="form-control-file" id="exampleFormControlFile1">
+                              </div>
+                              <input class="btn btn-primary" type="submit" value="Submit" onclick="salesOrderAdd()">
+                              &nbsp;&nbsp;&nbsp;
+                    <input class="btn btn-primary" type="reset" value="Cancel">
+                        </div>
+                    </div>
+
+                    <!-- bottom part ends -->
+         
+          </form>
+          
+
+    </body>
+    </html>
