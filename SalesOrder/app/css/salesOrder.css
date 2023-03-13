@@ -100,3 +100,14 @@ resize: none;
   margin-top: 15px;
   margin-left: 14px;
 }
+
+.modalInventoryItems{
+  background-color: #f3f8fe;
+  text-align: center;
+  padding-top: 1%;
+  height: 125px;
+}
+
+.grey_font{
+color: #afa1a9;
+}
