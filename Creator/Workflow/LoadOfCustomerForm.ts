@@ -1,0 +1,13 @@
+hide Tax_Rates;
+hide Tax_Exemptions;
+hide Tax_Agency1;
+hide Country;
+hide Shipping_Country;
+hide Shipping_State;
+hide Tax_Rates1;
+hide Tax_Exemption;
+hide Tax_Agency;
+hide Currencies1;
+hide State2;
+hide Hidden;
+hide Payment_Terms1;
