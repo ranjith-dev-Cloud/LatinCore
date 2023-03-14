@@ -111,3 +111,8 @@ resize: none;
 .grey_font{
 color: #afa1a9;
 }
+.selectStyle{
+  background: transparent;
+  border: none;
+  width: 50%;
+}

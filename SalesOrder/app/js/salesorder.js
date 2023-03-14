@@ -583,11 +583,7 @@ function salesOrderAdd() {
       } else {
         console.log("Error Calling Creator API- Add Record - On Form Submit from Widgets:" + response.code);
       }
-      console.log(JSON.stringify(response));
-      console.log(JSON.stringify(response.code));
-      console.log(JSON.stringify(response.message));
     });
-    console.log("hiii");
   });
 }
 
@@ -696,10 +692,7 @@ function populateTransactionsModal(selectorID) {
         $(".modal-body #salesAccount").text(itemDetailsData.Account);
         $(".modal-body #purchasePrice").text(itemDetailsData.Cost_Price);
         $(".modal-body #purchaseAccount").text(itemDetailsData.Account1);
-        //showRecentTransactionModal();
-        
       } else {
-
       }
     });
   });
@@ -709,7 +702,7 @@ function populateTransactionsModal(selectorID) {
 /**
  * 
  */
-function populateStockLocationDetails(selectorID){
+function populateStockLocationDetails(selectorID) {
   var itemID = $(selectorID).closest('tr').find('.selectedItemID').val();
   console.log(itemID);
   ZOHO.CREATOR.init().then(function (data) {
@@ -733,52 +726,81 @@ function populateStockLocationDetails(selectorID){
         var warehouseName = stockDetails[0].WAREHOUSE_NAME;
         var stockOnHandValue = stockDetails[0].Stock_on_Hand;
         //Set values for Stock Location Tab
-        // var stockTableData = "<tr><td class='text-left'>"+ warehouseName +"</td><td class='text-right'>"+ stockOnHandValue +"</td><td class='text-right'>"+ CommittedStock_Value +"</td><td class='text-right'>"+ AvbForSale_Value +"</td></tr>";
-        // console.log(stockTableData);
-        var selectedStock = $("#stockLocations option:selected").val();
-        if(selectedStock === "Physical"){
-          $("#stockOnHand").text(stockDetails[0].Stock_on_Hand);
-          $("#committedStock").text(stockDetails[0].Committed_Stock);
-          $("#availableForSale").text(stockDetails[0].Available_for_Sale);
-        }
-        if(selectedStock === "Account"){
-          $("#physicalStockOnHand").text(stockDetails[0].Actual_Stock_on_Hand);
-          $("#physicalCommittedStock").text(stockDetails[0].Actual_Committed_Stock);
-          $("#physicalAvailableForSale").text(stockDetails[0].Actual_Available_for_Sale);
-        }
-        showRecentTransactionModal();
-      }
+        $('#stockLocations').on('change', function () {
+          var selectedStock = $(this).val();
+          if (selectedStock === "Physical") {
+            var stockTableData = "<tr><td class='text-left'>" + warehouseName + "</td><td class='text-right'>" + stockDetails[0].Stock_on_Hand
+              + "</td><td class='text-right'>" + stockDetails[0].Committed_Stock + "</td><td class='text-right'>" + stockDetails[0].Available_for_Sale + "</td></tr>";
+          }
+          else if (selectedStock === "Accounting") {
+            var stockTableData = "<tr><td class='text-left'>" + warehouseName + "</td><td class='text-right'>" + stockDetails[0].Actual_Stock_on_Hand
+              + "</td><td class='text-right'>" + stockDetails[0].Actual_Committed_Stock + "</td><td class='text-right'>" + stockDetails[0].Actual_Available_for_Sale + "</td></tr>";
+          }
+          console.log(stockTableData);
+          removeRowStock();
+          $("#stockTable tbody").append(stockTableData);
 
+        });
+      }
+      showRecentTransactionModal();
     });
   });
-  //populateTransactionsDetails(selectorID);
+  populateTransactionsDetails(selectorID);
 }
 /**
  * 
  */
-// function populateTransactionsDetails(selectorID){
-//   var itemID = $(selectorID).closest('tr').find('.selectedItemID').val();
-//    console.log(itemID);
-//   ZOHO.CREATOR.init().then(function (data) {
-//     itemDetailsConfig = {
-//       appName: "latin-core-order-management",
-//       reportName: "Items_Widget_Subform_Report",
-//       Item_Name: itemID
-//     }
-//     console.log(itemDetailsConfig);
-//     ZOHO.CREATOR.API.getAllRecords(itemDetailsConfig).then(function (response) {
-//       //console.log(JSON.stringify(response.data));
-//       if (response.code == 3000) {
-//         $.each(response.data, function (idx, dataList) {
-//         associatedSalesOrderID = dataList.Sale_Order_ID.ID;
-//         console.log(associatedSalesOrderID);
-//         });
-//       }
-//     });
-//   });
-     //showRecentTransactionModal();
-
-// }
+function populateTransactionsDetails(selectorID){
+  var itemID = $(selectorID).closest('tr').find('.selectedItemID').val();
+   //console.log(itemID);
+  ZOHO.CREATOR.init().then(function (data) {
+    itemDetailsConfig = {
+      appName: "latin-core-order-management",
+      reportName: "Items_Widget_Subform_Report",
+      Item_Name: itemID
+    }
+    //console.log(itemDetailsConfig);
+    ZOHO.CREATOR.API.getAllRecords(itemDetailsConfig).then(function (response) {
+      //console.log("subform details");
+      //console.log(JSON.stringify(response.data));
+      if (response.code == 3000) {
+        $.each(response.data, function (idx, dataList) {
+          associatedSalesOrderID = dataList.Sale_Order_ID.ID;
+          console.log(associatedSalesOrderID);
+          var quantity = dataList.Quantity;
+          var itemPrice = dataList.rate;
+           getSalesOrderDetails(associatedSalesOrderID,quantity,itemPrice);
+       });
+      }
+    });
+  });
+showRecentTransactionModal();
+}
+/**
+ * 
+ */
+function getSalesOrderDetails(salesOrderID,quantityValue,itemPriceValue){
+        ZOHO.CREATOR.init().then(function (data) {
+          salesOrderDetailsConfig = {
+            appName: "latin-core-order-management",
+            reportName: "All_Sale_Orders",
+            //ID: salesOrderID
+            criteria: "(ID == " + salesOrderID + ")"
+          }
+          console.log(salesOrderDetailsConfig);
+          ZOHO.CREATOR.API.getAllRecords(salesOrderDetailsConfig).then(function (response) {
+            console.log(JSON.stringify(response.data));
+            if (response.code == 3000) {
+              var dataList = response.data[0];
+                var transactionstabledata = "<tr><td class='text-left'><p>"+ dataList.Customer_Name.display_value +"</p><p>"+ dataList.Sales_Order +" | " 
+                + dataList.Sales_Order_Date + "</p><p></p></td><td class='text-right'><p>Item Price :<span>" 
+                + itemPriceValue + "</span></p><p>Quantity Sold :<span>" + quantityValue + "</span></p></td></tr>";
+                // console.log(transactionstabledata);
+                $("#transactionTable tbody").append(transactionstabledata);
+            }
+          });
+        });
+}
 /*********************
  * JS API Calls Ends Here!!!!!!!
  **********************/
@@ -786,7 +808,22 @@ function populateStockLocationDetails(selectorID){
 /***********************
  * *Utility Function starts Here 
  ***********************/
-
+/**
+ * 
+ */
+function removeRowStock() {
+  try {
+      var stockTable = document.getElementById("stockTable");
+      var leadRowCount = stockTable.rows.length;
+      for (var i = 1; i < leadRowCount; i++) {
+        deltrowIndex = stockTable.rows.length -1;
+        stockTable.deleteRow(deltrowIndex);
+      }
+  } catch (e) {
+    console.log("delete Row error");
+    console.log("catch error"+e);
+  }
+}
 /**Jquery Function to auto resize the textarea for Biling and shipping Address 
   * 
  */

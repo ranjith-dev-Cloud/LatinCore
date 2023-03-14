@@ -49,13 +49,13 @@
 </div>
 
    <!-- Form Starts here-->
-   <form action="" name="newSalesOrder" id="newSalesOrder">
+   <form action="" name="newSalesOrder" id="newSalesOrder" onsubmit="validateSalesOrderWidget();">
     <div class="Customer_field_div">
         <div class="form-group row Customer_field">
             <label for="CustomerNameField" class="col-sm-2 col-form-label text_red required">Customer Name</label>
             <div class="col-md-5 input-group">
                 <!-- <select class="form-control" id="CustomerNameField" name="CustomerNameField" onchange=showAddressDetails();getItemListForTable();fetchTaxRates()> -->
-                    <select class="form-control" id="CustomerNameField" name="CustomerNameField" onchange=getItemListForTable();>
+                    <select class="form-control" id="CustomerNameField" name="CustomerNameField" onchange=showAddressDetails();getItemListForTable();>
                     <option value="" selected disabled>Select Customer</option>
                 </select>
                 <div class="input-group-append">
@@ -369,13 +369,14 @@
                                 <label for="exampleFormControlFile1">Attach File(s) to Sales Order </label>
                                 <input type="file" class="form-control-file" id="exampleFormControlFile1">
                               </div>
-                              <input class="btn btn-primary" type="submit" value="Submit" onclick="salesOrderAdd()">
+                              <input class="btn btn-primary" type="submit" value="Submit">
                               &nbsp;&nbsp;&nbsp;
                     <input class="btn btn-primary" type="reset" value="Cancel">
                         </div>
                     </div>
 
                     <!-- bottom part ends -->
+                  </form>
                     <!-- Modal Start Here-->
                     <div class="modal right fade" id="recentTransactionModal">
                         <div class="modal-dialog">
@@ -412,16 +413,17 @@
                                               </div>
                                               <div class="col-md-4 text-left">
                                                 <P class="grey_font">To be Shipped</P>
-                                                <h4><span id="tobeshippedValue"></span></h4>
+                                                <h4>0.00</h4>
                                               </div>
                                               <div class="col-md-2" style="margin-top: 5%;">
                                                 <i class='fas fa-truck-loading' style='font-size:24px;color: #3fa7ff;'></i>
                                               </div>
                                               <div class="col-md-4 text-left">
                                                 <P class="grey_font">To be Received</P>
-                                                <h4><span id="tobereceivedValue"></span></h4>
+                                                <h4>0.00</h4>
                                               </div>
                                             </div>
+                                            <p class="text-left">Stock Details</p>
                                             <p class="text-left">Stock Details</p>
                                             <p class="text-left" style="border-bottom: 1px solid black;padding-bottom: 2%;">ACCOUNTING STOCK</p>
                                             <div class="row col-md-12">
@@ -472,45 +474,49 @@
                                       <!--Sales Information starts here-->
                                   <p class="text-left" style="border-bottom: 1px solid black;padding-bottom: 2%;">Sales Information</p>
                                             <div class="row col-md-12">
-                                              <div class="row col-md-6">
+                                              <div class="col-md-6 text-left">
                                                 <p class="grey_font">Price</p>
                                               </div>
-                                              <div class="row col-md-6"></div>
+                                              <div class="col-md-6  text-right">
                                               <p><span id="salesPrice" name="salesPrice"></span></p>
                                             </div>
+                                            </div>
                                             <div class="row col-md-12">
-                                              <div class="row col-md-6">
+                                              <div class=" text-left col-md-6">
                                                 <p class="grey_font">Account</p>
                                               </div>
-                                              <div class="row col-md-6"></div>
+                                              <div class=" text-right col-md-6">
                                               <p><span id="salesAccount" name="salesAccount"></span></p>
+                                            </div>
                                             </div>
                                     <!--Sales Information ends here-->
                     <!--Purcahse Information starts here-->
                     <p class="text-left" style="border-bottom: 1px solid black;padding-bottom: 2%;">Purchase Information</p>
                                                 <div class="row col-md-12">
-                                                <div class="row col-md-6">
+                                                <div class="col-md-6 text-left">
                                                 <p class="grey_font">Price</p>
                                               </div>
-                                              <div class="row col-md-6"></div>
+                                              <div class="col-md-6 text-right">
                                               <p> <span id="purchasePrice" name="purchasePrice"></span></p>
                                             </div>
+                                          </div>
                                             <div class="row col-md-12">
-                                              <div class="row col-md-4">
+                                              <div class="col-md-6 text-left">
                                                 <p class="grey_font">Account</p>
                                               </div>
-                                              <div class="row col-md-8"></div>
+                                              <div class="col-md-6 text-right">
                                               <p id="purchaseAccount" name="purchaseAccount"></p>
+                                            </div>
                                             </div>
                                           </div>
                                           <!-- <div class="tab-pane fade" id="stock" role="tabpanel" aria-labelledby="stock-tab">profile</div> -->
                                           <div class="tab-pane fade" id="stock" role="tabpanel" aria-labelledby="stock-tab">
                                             <!-- <label for="sel1">Select list (select one):</label> -->
-                                          <select class="form-control" id="stockLocations" name="stockLocations" style="margin-top: 5%;">
+                                          <select class="form-control selectStyle" id="stockLocations" name="stockLocations" style="margin-top: 5%;">
                                                     <option value="Physical">Physical Stock</option>
-                                                    <option value="Account">Accounting Stock</option>
+                                                    <option value="Accounting">Accounting Stock</option>
                                           </select>
-                                          <table class="table">
+                                          <table class="table stockTable" id="stockTable">
                                             <thead>
                                               <tr>
                                                 <th class="text-left">WAREHOUSE NAME</th>
@@ -529,7 +535,55 @@
                                                </tbody>
                                           </table>
                                           </div>
-                                          <div class="tab-pane fade" id="transactions" role="tabpanel" aria-labelledby="transactions-tab">contact</div>
+                                          <div class="tab-pane fade" id="transactions" role="tabpanel" aria-labelledby="transactions-tab">
+                                            <table class="table" id="transactionTable">
+                                              <thead>
+                                                <tr>
+                                                  <th class="text-left">
+                                                    <select class="form-control" id="salesOrder" name="salesOrder" style="margin-top: 5%;">
+                                                      
+                                                      <option>Sales Order</option>
+                                                      <!-- <option>Estimate</option>
+                                                      <option>Invoice</option>
+                                                      <option>Credit Note</option>
+                                                      <option>Recurring Invoice</option>
+                                                      <option>Purchase Order</option>
+                                                      <option>Bill</option>
+                                                      <option>Vendor Credits</option> -->
+                                                    </select>
+                                                  </th>
+                                                  <th class="text-right">
+                                                    <select class="form-control" id="status" name="status" style="margin-top: 5%;">
+                                                      <option>All</option>
+                                                      <!-- <option>Draft</option>
+                                                      <option>Partially Invoiced</option>
+                                                      <option>Invoiced</option>
+                                                      <option>Closed</option>
+                                                      <option>Void</option>
+                                                      <option>Confirmed</option>
+                                                      <option>Overdue</option>
+                                                      <option>Partially shipped</option>
+                                                      <option>Shipped</option>
+                                                      <option>Dropshipped</option>
+                                                      <option>Backordered</option>
+                                                      <option>On Hold</option> -->
+                                                    </select>
+                                                  </th>
+                                                 
+                                                </tr>
+                                              </thead>
+                                              <tbody>
+                                                <tr>
+                                                  <td class="text-left">
+                                                    
+                                                  </td>
+                                                  <td class="text-right">
+                                                    
+                                                  </td>
+                                                </tr>
+                                              </tbody>
+                                            </table>
+                                          </div>
                                         </div>
                                       </div>
                   
@@ -539,7 +593,7 @@
                 
                     </div>
                     <!--Modal Ends Here-->
-          </form>
+         
          
             
 
