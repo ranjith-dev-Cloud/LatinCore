@@ -1,39 +1,60 @@
+/******************************
+ * Creator - JS APi Calls Starts Here
+ ******************************/
+
+/**
+ * This fucntion is fetch all customer data based on pagenum
+ */
 function fetchCustomerData() {
-  ZOHO.CREATOR.init().then(function (data) {
+  var creatorSdk = ZOHO.CREATOR.init();
+
+  creatorSdk.then(function (data) {
+    getCustomerData("1");
+  });
+  async function getCustomerData(pageNum) {
     config = {
       appName: "latin-core-order-management",
       reportName: "All_Customers",
-      criteria: "(Customer_Name != \"\")",
+      criteria: "(Customer_Name != \"\") sort by ID desc",
+      page: pageNum,
       pageSize: 200
-    };
-    ZOHO.CREATOR.API.getAllRecords(config).then(function (response) {
-      console.log("resp Length" + JSON.stringify(response.data.length));
-      if (response.code == 3000) {
-        $.each(response.data, function (index, dataList) {
-          //var customerName = (dataList.Customer_Name == "") ? dataList.Contact_Name : dataList.Customer_Name;
-          $('#CustomerNameField').append('<option value="' + dataList.ID + '">' + dataList.Customer_Name + '</option>');
-        });
-        fetchWareHouse();
-        fetchPaymentTerms();
-        fetchDeliveryMethod();
-        fetchSalesPerson();
-      } else {
-        console.log("Error Calling Creator API:" + response.code);
-      }
-    });
-  });
+    }
+    var getRecords = ZOHO.CREATOR.API.getAllRecords(config);
+    getRecords.then(function (response) {
+      $.each(response.data, function (idx, dataList) {
+        $('#CustomerNameField').append('<option value="' + dataList.ID + '">' + dataList.Customer_Name + '</option>');
+      });
+      var recordsLength = Object.keys(response.data).length;
+      // if (recordsLength == 200) {
+
+      //   getCustomerData(parseInt(pageNum) + 1);
+      // }
+      // else {
+      //   console.log("Less than 200");
+      // }
+    }).catch(err => console.log("No matching records"));
+  }
+  fetchWareHouse();
+  fetchPaymentTerms();
+  fetchDeliveryMethod();
+  fetchSalesPerson();
 }
-function fetchTaxRates() {
+
+/**
+ * This function is to get the warehouse details from creator
+ * 
+ */
+function fetchWareHouse() {
   ZOHO.CREATOR.init().then(function (data) {
     config = {
       appName: "latin-core-order-management",
-      reportName: "All_Taxes"
+      reportName: "All_Warehouses"
     };
     ZOHO.CREATOR.API.getAllRecords(config).then(function (response) {
       //console.log("resp" + JSON.stringify(response));
       if (response.code == 3000) {
         $.each(response.data, function (index, dataList) {
-          $('#paymentTerms').append('<option value="' + dataList.ID + '">' + dataList.Tax_Name + '</option>');
+          $('#wareHouseName').append('<option value="' + dataList.ID + '">' + dataList.Warehouse_Name + '</option>');
         });
       } else {
         console.log("Error Calling Creator API:" + response.code);
@@ -41,11 +62,11 @@ function fetchTaxRates() {
     });
   });
 }
-function fetchWareHouse() {
-  wareHouseName = "Latin Core Inc";
-  $("#wareHouseName").append('<option value="' + wareHouseName + '">' + wareHouseName + '</option>')
+/**
+ * This function is to get the payment terms data from creator
+ * 
+ */
 
-}
 function fetchPaymentTerms() {
   ZOHO.CREATOR.init().then(function (data) {
     config = {
@@ -64,6 +85,10 @@ function fetchPaymentTerms() {
     });
   });
 }
+/**
+ * This function is to get the delivery method list from creator
+ * 
+ */
 function fetchDeliveryMethod() {
   ZOHO.CREATOR.init().then(function (data) {
     config = {
@@ -82,6 +107,10 @@ function fetchDeliveryMethod() {
     });
   });
 }
+/**
+ * This function is to get the sales person list from creator
+ * 
+ */
 function fetchSalesPerson() {
   ZOHO.CREATOR.init().then(function (data) {
     config = {
@@ -100,76 +129,46 @@ function fetchSalesPerson() {
     });
   });
 }
+/**
+ * This function is to get the item Details for salesorder
+ * Fetched data will be populated in Item Details table
+ * invoked on change of Customer 
+ */
 function getItemListForTable() {
-  ZOHO.CREATOR.init().then(function (data) {
-    config = {
-      appName: "latin-core-order-management",
-      reportName: "All_Items"
-    };
-    ZOHO.CREATOR.API.getAllRecords(config).then(function (response) {
-      //console.log("item resp" + JSON.stringify(response));
-      if (response.code == 3000) {
-        $.each(response.data, function (index, dataList) {
-          //var optionValue = value.Selling_Price + "," + value.SKU + "," + value.StockInHand;
-          var optionValue = dataList.ID + "," + dataList.Selling_Price + "," + dataList.SKU + "," + dataList.Tax_Preference + "," + dataList.Exemption_Reason;
-          //console.log("itemId::"+dataList.ID);
-          //var optionValue = dataList.ID + "," + dataList.Selling_Price + "," + dataList.SKU ;
-          // selectValue = '<option value="'+ optionValue + '">' + dataList.Name + "\n  Rate: " + dataList.Selling_Price +" SKU : " + dataList.SKU + '</option>';
-          selectValue = '<option value="' + optionValue + '">' + dataList.Name + '</option>';
-          $('#selectItem').append(selectValue);
-          //});
-        });
-      } else {
-        //alert Error Message
-        console.log("Error Calling Creator API:" + response.code);
-      }
-    });
+  var creatorSdk = ZOHO.CREATOR.init();
+  creatorSdk.then(function (data) {
+    getItemDetailsData("1");
   });
-}
-function fetchTaxRates() {
-  selectedCustomer = $("#CustomerNameField").val();
-  //console.log(selectedCustomer);
-  taxDetailsArray = [];
-  ZOHO.CREATOR.init().then(function (data) {
-    config = {
+  async function getItemDetailsData(pageNum) {
+    itemDetailsConfig = {
       appName: "latin-core-order-management",
-      reportName: "All_Customers",
-      id: selectedCustomer
+      reportName: "All_Items",
+      page: pageNum,
+      pageSize: 200
     };
-    ZOHO.CREATOR.API.getRecordById(config).then(function (response) {
-      //console.log("resp" + JSON.stringify(response.data));
-      if (response.code == 3000) {
-        //console.log(response.data.Tax_Rates);
-        taxDetails = response.data.Tax_Rates;
-        if (taxDetails != "") {
-          taxId = response.data.Tax_Rates.ID;
-          taxName = response.data.Tax_Rates.display_value;
-          //console.log(taxId+""+ taxName);
+    var getRecords = ZOHO.CREATOR.API.getAllRecords(itemDetailsConfig);
+    getRecords.then(function (response) {
+      //console.log("item Details:"+JSON.stringify(response.data));
+      $.each(response.data, function (index, dataList) {
+        var optionValue = dataList.ID + "," + dataList.Selling_Price + "," + dataList.SKU + "," + dataList.Tax_Preference + "," + dataList.Exemption_Reason;
+        selectValue = '<option value="' + optionValue + '">' + dataList.Name + '</option>';
+        $('#selectItem').append(selectValue);
+      });
+      // var recordsLength = Object.keys(response.data).length;
+      // if (recordsLength == 200) {
 
-          if ($(".taxDetailsDropdown option[value='" + taxId + "']").length > 0) {
-            $(".taxDetailsDropdown option[value='" + taxId + "']").prop('selected', true);
-          } else {
-            $(".taxDetailsDropdown").append('<option value="' + taxId + '">' + taxName + '</option>');
-            $(".taxDetailsDropdown option").prop('selected', true);
-            $("#taxName").text(taxName);
-          }
-          $("#customerTaxRate").val($(".taxDetailsDropdown option:selected").val());
-        }
-        else {
-          console.log("Inside else");
-        }
-        //});
+      //   getItemDetailsData(parseInt(pageNum) + 1);
+      // }
+      // else {
+      //   console.log("No more Items to Fetch");
+      // }
+    }).catch(err => console.log("No matching records"));
+  }
 
-      } else {
-        console.log("Error Calling Creator API:" + response.code);
-      }
-    });
-  });
 }
+
+/** This function is to get the Acutal Stock and Stock on Hand details from Item Stock Subform */
 function getStockDetailsForItem(seletectedItemId, stockId, actualStockID) {
-
-  //console.log(seletectedItemId);
-
   ZOHO.CREATOR.init().then(function (data) {
     config = {
       appName: "latin-core-order-management",
@@ -190,11 +189,18 @@ function getStockDetailsForItem(seletectedItemId, stockId, actualStockID) {
         $(actualStockID).val(actualStockOnHand);
       } else {
         console.log("Error Calling Creator API:" + response.code);
+        $(stockId).val(0.00);
+        $(actualStockID).val(0.00);
       }
     });
   });
 }
-
+/** This function is to construct JSON Object for main form along with Item Details SubForm
+ * Get all the values for main form
+ * Iterate through each row in Item Details Table and construct subform JSON Object
+ * Call addRecord API to submit the Sales Order Form in Creator
+ * Format SalesOrder Date and Expected Shipment date from String to Date
+ */
 function salesOrderAdd() {
 
   ZOHO.CREATOR.init().then(function (data) {
@@ -203,26 +209,17 @@ function salesOrderAdd() {
     formData['Customer_Name'] = $('#CustomerNameField').val();
     formData['Sales_Order'] = $('#saleord').val();
     formData['Reference'] = $('#ref').val();
-  
-    var salesOrderDate = new Date($('#salesOrderDatepicker').val());
-    console.log(salesOrderDate.toLocaleDateString());
-    var expDate = $("#datepicker2").val();
-    var expDate_match = /(\d+)\/(\d+)\/(\d+)/.exec(expDate);
-    var expectedShipmentDate = new Date(expDate_match[3], expDate_match[2], expDate_match[1]);
-    console.log(expectedShipmentDate);
-    console.log("variable type2:"+ $.type(expectedShipmentDate));
-    console.log(expectedShipmentDate.toLocaleDateString());
 
-    //formData['Sales_Order_Date'] = $('#datepicker').val();
-    //formData['Expected_Shipment_Date'] = $('#fecha1').val();
-    console.log($('#paymentTerms option:selected').val());
-    console.log($('#deliveryMethod option:selected').val());
-    console.log($('#salesPerson option:selected').val());
+    var salesOrderDate = new Date($('#salesOrderDatepicker').val());
+    var expDate = new Date($("#datepicker2").val());
+    // var expDate_match = /(\d+)\/(\d+)\/(\d+)/.exec(expDate);
+    // var expectedShipmentDate = new Date(expDate_match[3], expDate_match[2], expDate_match[1]);
+
     formData['Sales_Order_Date'] = salesOrderDate.toLocaleDateString();
-    formData['Expected_Shipment_Date'] = expectedShipmentDate.toLocaleDateString();
+    formData['Expected_Shipment_Date'] = expDate.toLocaleDateString();
     formData['Payment_Terms'] = $('#paymentTerms option:selected').val();
     formData['Delivery_Method'] = $('#deliveryMethod option:selected').val();
-    //formData['Warehouse_Name'] = $('#wareHouseName').val();
+    formData['Warehouse_Name'] = $('#wareHouseName option:selected').val();
     formData['Sales_Persons'] = $('#salesPerson option:selected').val()
 
     formData['Sub_Total'] = parseFloat($("#subTotal").text());
@@ -245,23 +242,14 @@ function salesOrderAdd() {
       if (index != 0) {
         var currentRow = $(this);
         var itemDescription = currentRow.find("td:eq(0) .itemDescription").val();
-        // console.log(itemDescription);
         var selectedItemID = currentRow.find("td:eq(0) .selectedItemID").val();
-        // console.log(selectedItemID);
         var skuValue = currentRow.find("td:eq(2) .skuValueColumn").val();
-        // console.log(skuValue);
         var quantity = currentRow.find("td:eq(3) .Quantity").val();
-        // console.log(quantity);
         var stockOnHand = currentRow.find("td:eq(3) .stockinHandValue").val();
-        // console.log(stockOnHand);
         var actualStock = currentRow.find("td:eq(3) .actualStockinHandValue").val();
-        // console.log(actualStock);
         var rateValue = currentRow.find("td:eq(4) .rateValueColumn").val();
-        // console.log(rateValue);
         var taxDetails = currentRow.find("td:eq(5) .taxDetailsDropdown").val();
-        // console.log(taxDetails);
         var totalAmount = currentRow.find("td:eq(6) .totalAmount").val();
-        // console.log(totalAmount);
 
         tableRowsObject = {};
         tableRowsObject.Item_Name = selectedItemID;
@@ -278,7 +266,6 @@ function salesOrderAdd() {
 
       }
     });
-
     // console.log(subFormItemData);
     formData['Items'] = subFormItemData;
 
@@ -301,50 +288,225 @@ function salesOrderAdd() {
       } else {
         console.log("Error Calling Creator API- Add Record - On Form Submit from Widgets:" + response.code);
       }
-      console.log(JSON.stringify(response));
-      console.log(JSON.stringify(response.code));
-      console.log(JSON.stringify(response.message));
     });
-    console.log("hiii");
   });
 }
 
-function generateSalesOrderNumber(){
-  ZOHO.CREATOR.init().then(function(data) {
-          config = {
-          appName : "latin-core-order-management",
-	        reportName : "All_Sale_Orders",
-          criteria :  "Sales_Order != null sort by ID desc"
-         }
-         console.log(config);
-          ZOHO.CREATOR.API.getAllRecords(config).then(function(response){
-             console.log(response.data);
-             var salesOrderNumber = response.data[0].Sales_Order;
-             var salesOrderID = salesOrderNumber.split("-");
-             var salesOrderUniqueID = "SO-" + (parseInt(salesOrderID[1]) +1);
-             console.log(salesOrderUniqueID);
-             
-              $("#saleord").val(salesOrderUniqueID);
-              $("#saleord").prop("disabled","true");
-           });
-});
+/** This function is to generate Salers Order number and disable the sales order number field */
+function generateSalesOrderNumber() {
+  ZOHO.CREATOR.init().then(function (data) {
+    config = {
+      appName: "latin-core-order-management",
+      reportName: "All_Sale_Orders",
+      criteria: "Sales_Order != null sort by ID desc"
+    }
+    console.log(config);
+    ZOHO.CREATOR.API.getAllRecords(config).then(function (response) {
+      console.log(response.data);
+      if (response.code == 3000) {
+        var salesOrderNumber = response.data[0].Sales_Order;
+        console.log("salesOrdernumber:"+salesOrderNumber);
+        var salesOrderID = salesOrderNumber.split("-");
+        var salesOrderUniqueID = "SO-" + (parseInt(salesOrderID[1]) + 1);
+        console.log(salesOrderUniqueID);
+
+        $("#saleord").val(salesOrderUniqueID);
+        $("#saleord").prop("disabled", "true");
+      } else {
+        console.log(response.err);
+      }
+
+    });
+  });
 }
-// function getSalesOrderData() {
-//   ZOHO.CREATOR.init().then(function (data) {
-//     config = {
-//       appName: "latin-core-order-management",
-//       reportName: "All_Sale_Orders",
-//       id : "4008259000000202031"
-//     };
-//     ZOHO.CREATOR.API.getRecordById(config).then(function (response) {
-//       console.log("resp" + JSON.stringify(response));
-//       // if (response.code == 3000) {
-//       //   $.each(response.data, function (index, dataList) {
-//       //     $('#paymentTerms').append('<option value="' + dataList.ID + '">' + dataList.Tax_Name + '</option>');
-//       //   });
-//       // } else {
-//       //   console.log("Error Calling Creator API:" + response.code);
-//       // }
-//     });
-//   });
-// }
+/**
+ *  This function is to show the address and tax details of the selected customer
+ */
+function showAddressDetails() {
+  var selectedCustomerID = $("#CustomerNameField option:selected").val();
+  ZOHO.CREATOR.init().then(function (data) {
+    addressDetailsConfig = {
+      appName: "latin-core-order-management",
+      reportName: "All_Customers",
+      id: selectedCustomerID
+    }
+    console.log(addressDetailsConfig);
+    ZOHO.CREATOR.API.getRecordById(addressDetailsConfig).then(function (response) {
+      //console.log(JSON.stringify(response.data));
+      if (response.code == 3000) {
+        customerDetails = response.data;
+        billingAddressDetails = customerDetails.Address_Street_1 + " " + customerDetails.Address_Street_2 + "\n" + customerDetails.City
+          + "\n" + customerDetails.State.display_value + " " + customerDetails.Z + "\n" + customerDetails.Country;
+        shippingAddressDetails = customerDetails.Address_Street_11 + " " + customerDetails.Address_Street_21 + "\n" + customerDetails.City1
+          + "\n" + customerDetails.Shipping_State + " " + customerDetails.Zip_Code + "\n" + customerDetails.Shipping_Country;
+        taxDetails = response.data.Tax_Rates;
+        if (taxDetails != "") {
+          taxId = response.data.Tax_Rates.ID;
+          taxName = response.data.Tax_Rates.display_value;
+          //console.log(taxId+""+ taxName);
+          if ($(".taxDetailsDropdown option[value='" + taxId + "']").length > 0) {
+            $(".taxDetailsDropdown option[value='" + taxId + "']").prop('selected', true);
+          } else {
+            $(".taxDetailsDropdown").append('<option value="' + taxId + '">' + taxName + '</option>');
+            $(".taxDetailsDropdown option").prop('selected', true);
+            $("#taxName").text(taxName);
+          }
+          $("#tax").val(taxName);
+          $("#customerTaxRate").val($(".taxDetailsDropdown option:selected").val());
+        }
+        else {
+          console.log("Inside else");
+        }
+        $("#billingAddr").append(billingAddressDetails);
+        $("#shippingAddr").append(shippingAddressDetails);
+
+        $("#addressTaxDiv").attr("style", "display:block");
+        autoResize();
+      } else {
+        console.log(response.code);
+        console.log(response.err);
+      }
+
+    });
+  });
+}
+
+/**
+ * 
+ * @returns 
+ */
+function populateTransactionsModal(selectorID) {
+  var itemID = $(selectorID).closest('tr').find('.selectedItemID').val();
+  //.attr('class');
+  console.log(itemID);
+  ZOHO.CREATOR.init().then(function (data) {
+    itemDetailsConfig = {
+      appName: "latin-core-order-management",
+      reportName: "All_Items",
+      id: itemID
+    }
+    console.log(itemDetailsConfig);
+    ZOHO.CREATOR.API.getRecordById(itemDetailsConfig).then(function (response) {
+      console.log(JSON.stringify(response.data));
+      if (response.code == 3000) {
+        var itemDetailsData = response.data;
+        $(".modal-body #itemName").text(itemDetailsData.Name);
+        $(".modal-body #skuDetails").text(itemDetailsData.SKU);
+        $(".modal-body #unitValue").text(itemDetailsData.Unit);
+        $(".modal-body #categoryValue").text(itemDetailsData.Category);
+        $(".modal-body #salesPrice").text(itemDetailsData.Selling_Price);
+        $(".modal-body #salesAccount").text(itemDetailsData.Account);
+        $(".modal-body #purchasePrice").text(itemDetailsData.Cost_Price);
+        $(".modal-body #purchaseAccount").text(itemDetailsData.Account1);
+      } else {
+      }
+    });
+  });
+  populateStockLocationDetails(selectorID);
+}
+
+/**
+ * 
+ */
+function populateStockLocationDetails(selectorID) {
+  var itemID = $(selectorID).closest('tr').find('.selectedItemID').val();
+  console.log(itemID);
+  ZOHO.CREATOR.init().then(function (data) {
+    stockDetailsConfig = {
+      appName: "latin-core-order-management",
+      reportName: "Item_Stock_subform_Report",
+      criteria: "(Items == " + itemID + ")"
+    }
+    console.log(stockDetailsConfig);
+    ZOHO.CREATOR.API.getAllRecords(stockDetailsConfig).then(function (response) {
+      console.log(JSON.stringify(response.data));
+      if (response.code == 3000) {
+        stockDetails = response.data;
+        $("#stockOnHand").text(stockDetails[0].Stock_on_Hand);
+        $("#committedStock").text(stockDetails[0].Committed_Stock);
+        $("#availableForSale").text(stockDetails[0].Available_for_Sale);
+        $("#physicalStockOnHand").text(stockDetails[0].Actual_Stock_on_Hand);
+        $("#physicalCommittedStock").text(stockDetails[0].Actual_Committed_Stock);
+        $("#physicalAvailableForSale").text(stockDetails[0].Actual_Available_for_Sale);
+
+        var warehouseName = stockDetails[0].WAREHOUSE_NAME;
+        var stockOnHandValue = stockDetails[0].Stock_on_Hand;
+        //Set values for Stock Location Tab
+        $('#stockLocations').on('change', function () {
+          var selectedStock = $(this).val();
+          if (selectedStock === "Physical") {
+            var stockTableData = "<tr><td class='text-left'>" + warehouseName + "</td><td class='text-right'>" + stockDetails[0].Stock_on_Hand
+              + "</td><td class='text-right'>" + stockDetails[0].Committed_Stock + "</td><td class='text-right'>" + stockDetails[0].Available_for_Sale + "</td></tr>";
+          }
+          else if (selectedStock === "Accounting") {
+            var stockTableData = "<tr><td class='text-left'>" + warehouseName + "</td><td class='text-right'>" + stockDetails[0].Actual_Stock_on_Hand
+              + "</td><td class='text-right'>" + stockDetails[0].Actual_Committed_Stock + "</td><td class='text-right'>" + stockDetails[0].Actual_Available_for_Sale + "</td></tr>";
+          }
+          console.log(stockTableData);
+          removeRowStock();
+          $("#stockTable tbody").append(stockTableData);
+
+        });
+      }
+      showRecentTransactionModal();
+    });
+  });
+  populateTransactionsDetails(selectorID);
+}
+/**
+ * 
+ */
+function populateTransactionsDetails(selectorID){
+  var itemID = $(selectorID).closest('tr').find('.selectedItemID').val();
+   //console.log(itemID);
+  ZOHO.CREATOR.init().then(function (data) {
+    itemDetailsConfig = {
+      appName: "latin-core-order-management",
+      reportName: "Items_Widget_Subform_Report",
+      Item_Name: itemID
+    }
+    //console.log(itemDetailsConfig);
+    ZOHO.CREATOR.API.getAllRecords(itemDetailsConfig).then(function (response) {
+      //console.log("subform details");
+      //console.log(JSON.stringify(response.data));
+      if (response.code == 3000) {
+        $.each(response.data, function (idx, dataList) {
+          associatedSalesOrderID = dataList.Sale_Order_ID.ID;
+          console.log(associatedSalesOrderID);
+          var quantity = dataList.Quantity;
+          var itemPrice = dataList.rate;
+           getSalesOrderDetails(associatedSalesOrderID,quantity,itemPrice);
+       });
+      }
+    });
+  });
+showRecentTransactionModal();
+}
+/**
+ * 
+ */
+function getSalesOrderDetails(salesOrderID,quantityValue,itemPriceValue){
+        ZOHO.CREATOR.init().then(function (data) {
+          salesOrderDetailsConfig = {
+            appName: "latin-core-order-management",
+            reportName: "All_Sale_Orders",
+            //ID: salesOrderID
+            criteria: "(ID == " + salesOrderID + ")"
+          }
+          console.log(salesOrderDetailsConfig);
+          ZOHO.CREATOR.API.getAllRecords(salesOrderDetailsConfig).then(function (response) {
+            console.log(JSON.stringify(response.data));
+            if (response.code == 3000) {
+              var dataList = response.data[0];
+                var transactionstabledata = "<tr><td class='text-left'><p>"+ dataList.Customer_Name.display_value +"</p><p>"+ dataList.Sales_Order +" | " 
+                + dataList.Sales_Order_Date + "</p><p></p></td><td class='text-right'><p>Item Price :<span>" 
+                + itemPriceValue + "</span></p><p>Quantity Sold :<span>" + quantityValue + "</span></p></td></tr>";
+                // console.log(transactionstabledata);
+                $("#transactionTable tbody").append(transactionstabledata);
+            }
+          });
+        });
+}
+/*********************
+ * JS API Calls Ends Here!!!!!!!
+ **********************/
