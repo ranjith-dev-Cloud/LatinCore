@@ -285,6 +285,7 @@ function salesOrderAdd() {
       if (response.code == 3000) {
         alert("Data Added Successfully");
         console.log("Record added successfully");
+        //resetForm();
       } else {
         console.log("Error Calling Creator API- Add Record - On Form Submit from Widgets:" + response.code);
       }

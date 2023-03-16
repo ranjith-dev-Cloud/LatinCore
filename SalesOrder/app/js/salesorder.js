@@ -60,10 +60,12 @@ function calculateTotalAmount(quantityID, rowId) {
 //populate entered discount and other values to respective column for calculation
 function populateValue() {
 
-  var shippingChargesValue = (parseFloat(($("#shippingCharges").val()))).toFixed(2);
-  var adjustmentValue = (parseFloat($("#adjustmentData").val())).toFixed(2)
-  $("#shippingChargesValue").text(shippingChargesValue);
-  $("#adjustmentValue").text(adjustmentValue);
+  var shippingChargesValue = ($("#shippingCharges").val() !="")? parseFloat($("#shippingCharges").val()).toFixed(2) : 0.00;
+  var adjustmentValue = ($("#adjustmentData").val() !="") ? parseFloat($("#adjustmentData").val()).toFixed(2) : 0.00;
+  console.log("adjustmentValue::");
+  console.log(adjustmentValue);
+  $("#shippingChargesValue").text((shippingChargesValue!="")?shippingChargesValue:0.00);
+  $("#adjustmentValue").text((adjustmentValue!="")?adjustmentValue:0.00);
 
   var subTotalValue = parseFloat($("#subTotal").text());
   var selectedDiscountType = $('#discountType').val();
@@ -114,6 +116,7 @@ function calculateSubTotal() {
     $("#taxDetailsValue").text(0);
   }
   $("#subTotal").text(parseFloat(testSubTotalAmount).toFixed(2));
+  $("#totalValueCalculated").text(parseFloat(testSubTotalAmount).toFixed(2));
 }
 
 //calculate overall sales order total amount
@@ -251,7 +254,11 @@ function Clone() {
 function disableTaxDetails() {
   var taxPercentage = $("#taxDetails option:selected").val();
   if (taxPercentage === "Non-Taxable") {
-    $(taxDetailsId).prop('disabled', false);
+    $("#taxDetails").prop('disabled', false);
+   // $("#taxName").text("");
+   $("#taxDetailsDiv").attr("style","display:none");
+  }else{
+    $("#taxDetailsDiv").attr("style","display:block");
   }
 
 }
@@ -266,7 +273,7 @@ function disableTaxDetails() {
  * once validation status is true, call salesorderAdd function to add record in creator
  */
 //validate form for mandatory fields 
-function validateSalesOrderWidget() {
+function validateSalesOrderWidget(eveent) {
   console.log("inside form validation");
   var customerName = $("#CustomerNameField").val();
   var salesOrderDate = $("#salesOrderDatepicker").val();
@@ -287,6 +294,8 @@ function validateSalesOrderWidget() {
   if (validationStatus) {
     salesOrderAdd();
   }
+ //to prevent page reload
+  e.preventDefault(); 
   return validationStatus;
 }
 

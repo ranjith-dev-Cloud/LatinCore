@@ -38,6 +38,13 @@ function removeRowStock() {
     $('.modal.right.fade, .modal-dialog').css({ "right": "0", "-webkit-transition": "opacity 0.3s linear, right 0.3s ease-out", "-moz-transition": "opacity 0.3s linear, right 0.3s ease-out", "-o-transition": "opacity 0.3s linear, right 0.3s ease-out", "transition": "opacity 0.3s linear, right 0.3s ease-out" });
     $('.modal.right.fade.in, .modal-dialog').css({ "right": "0" });
   }
+
+  /**
+   * This function is to reset the form after submit and prevent page reload
+   */
+  function resetForm(){
+    $("#newSalesOrder")[0].reset();
+  }
   /***********************
    * *Utility Function Ends Here 
    ***********************/
